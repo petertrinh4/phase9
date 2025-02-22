@@ -1,0 +1,5 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/petertrinh/Documents/GitHub/phase9/phase9'
+relocations:     []
+...
