@@ -201,11 +201,12 @@ void dealHand(int deck[DECK], int *deckIdx, int playerHand[HAND]) {
 
 //Display player hand function
 void displayPlayerHand(char player[NAME], int playerHand[HAND]) {
+    int idx = ZERO;
     printf("\n%s's hand:\n\n", player);
     printf("+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+\n");
     printf("|       |       |       |       |       |       |       |       |       |       |\n");
     printf("|");
-    for(int idx = 0; idx < HAND; idx++) {
+    for(int idx = ZERO; idx < HAND; idx++) {
         if(playerHand[idx] == WILD) {
             printf("   W   |");
         }
