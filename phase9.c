@@ -88,7 +88,7 @@ void playGame() {
         scanf("%s", two); //Scan statement to store player two’s name in variable two
         printf("\n%s and %s let's play Phase 9!\n", one, two); //Print statement using the entered player names to play phase 9
         initializeDeck(deck);
-        printf("\nOriginal deck of cards:\n");
+        printf("\nUnshuffled deck of cards:\n");
         displayDeck(deck);
         printf("\n"); //Separates the deck of cards
         shuffleDeck(deck);
