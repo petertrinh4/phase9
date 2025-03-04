@@ -29,15 +29,14 @@ void welcomeScreen();
 void playGame();
 int displayMenu();
 void displayLeaderboard();
-int drawCard();
-void initializeDeck();
-void shuffleDeck();
-void displayDeck();
-void dealHand();
-void displayPlayerHand();
-int dealDiscard();
-void displayDiscard();
-int comp();
+void initializeDeck(int deck[DECK]);
+void shuffleDeck(int deck[DECK]);
+void displayDeck(int deck[DECK]);
+void dealHand(int deck[DECK], int* deckIdx, int playerHand[HAND]);
+void displayPlayerHand(char player[NAME], int playerHand[HAND]);
+int dealDiscard(int deck[DECK], int* deckIdx);
+void displayDiscard(int discard);
+int comp(const void* a, const void* b);
 
 //Main function
 int main() {
@@ -118,6 +117,7 @@ void playGame() {
         displayLeaderboard();
     }
     else {
+        printf("\nThank you for playing Phase 9!\n");
         exit(ZERO);
     }
     choice = displayMenu();
@@ -160,61 +160,61 @@ for(int a = ZERO; a < EIGHT; a++) {
     idx++;
     }
 }
-for(c = ZERO; c < EIGHT; c++) { //Adds in 8 wild cards
+for(int c = ZERO; c < EIGHT; c++) { //Adds in 8 wild cards
     deck[idx] = WILD;
     idx++;
 }
-for(d = ZERO; d < FOUR; d++) { //Adds 4 skip cards
+for(int d = ZERO; d < FOUR; d++) { //Adds 4 skip cards
     deck[idx] = SKIP;
     idx++;
 }
 }
 
-//Shuffle deck function
+//Shuffle deck function (Durstenfeld shuffle algorithm)
 void shuffleDeck(int deck[DECK]) {
-    int idx = ZERO;
-    for(idx = ZERO; idx < DECK; idx++) {
-        int c = rand() % DECK;
-        int card = deck[idx];
-        deck[idx] = deck[c];
-        deck[c] = card;
+    int a = ZERO;
+    for(int a = ZERO; a < DECK; a++) {
+        int b = rand() % DECK;
+        int card = deck[a];
+        deck[a] = deck[b];
+        deck[b] = card;
     }
 }
 
 //Display deck function
 void displayDeck(int deck[DECK]) {
-    int idx = ZERO;
-    for(idx = ZERO; idx < DECK; idx++) {
-        printf("%d ", deck[idx]);
+    int a = ZERO;
+    for(int a = ZERO; a < DECK; a++) {
+        printf("%d ", deck[a]);
     }
     printf("\n");
 }
 
 //Deal hand function
 void dealHand(int deck[DECK], int *deckIdx, int playerHand[HAND]) {
-    int idx = ZERO;
-    for(idx = ZERO; idx < HAND; idx++) {
-        playerHand[idx] = deck[*deckIdx];
+    int a = ZERO;
+    for(int a = ZERO; a < HAND; a++) {
+        playerHand[a] = deck[*deckIdx];
         (*deckIdx)++;
     }
 }
 
 //Display player hand function
 void displayPlayerHand(char player[NAME], int playerHand[HAND]) {
-    int idx = ZERO;
+    int a = ZERO;
     printf("\n%s's hand:\n\n", player);
     printf("+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+\n");
     printf("|       |       |       |       |       |       |       |       |       |       |\n");
     printf("|");
-    for(int idx = ZERO; idx < HAND; idx++) {
-        if(playerHand[idx] == WILD) {
+    for(int a = ZERO; a < HAND; a++) {
+        if(playerHand[a] == WILD) {
             printf("   W   |");
         }
-        else if(playerHand[idx] == SKIP) {
+        else if(playerHand[a] == SKIP) {
             printf("   S   |");
         }
         else {
-            printf("  %3d  |", playerHand[idx]);
+            printf("  %3d  |", playerHand[a]);
         }
     }
     printf("\n|       |       |       |       |       |       |       |       |       |       |\n");
@@ -252,12 +252,6 @@ void displayLeaderboard() {
     printf("       5          Lisa        25       \n");
     printf("       6          Tyler       17       \n");
     printf("       7          Manny       16       \n");
-}
-
-//Draw card function
-int drawCard() {
-int cardValue = (rand() % FOURTEEN) + ONE; //Randomizes number between 0-13 then adds shift to the right by one, so 1-14
-return cardValue; //Returns card value
 }
 
 //Shuffle card function
