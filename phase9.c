@@ -149,11 +149,6 @@ return choice;
 //Initialize deck function
 void initializeDeck(int deck[DECK]) {
 int idx = ZERO; //Idx used to count cards in array 'deck'
-int a = ZERO;
-int b = ONE; //Initializing variables for the loops to function properly
-int c = ZERO;
-int d = ZERO;
-
 for(int a = ZERO; a < EIGHT; a++) {
     for(int b = ONE; b <= TWELVE; b++) { //Adds in cards 1-12 w/ total of 96 cards
     deck[idx] = b;
@@ -172,7 +167,6 @@ for(int d = ZERO; d < FOUR; d++) { //Adds 4 skip cards
 
 //Shuffle deck function (Durstenfeld shuffle algorithm)
 void shuffleDeck(int deck[DECK]) {
-    int a = ZERO;
     for(int a = ZERO; a < DECK; a++) {
         int b = rand() % DECK;
         int card = deck[a];
@@ -183,7 +177,6 @@ void shuffleDeck(int deck[DECK]) {
 
 //Display deck function
 void displayDeck(int deck[DECK]) {
-    int a = ZERO;
     for(int a = ZERO; a < DECK; a++) {
         printf("%d ", deck[a]);
     }
@@ -192,7 +185,6 @@ void displayDeck(int deck[DECK]) {
 
 //Deal hand function
 void dealHand(int deck[DECK], int *deckIdx, int playerHand[HAND]) {
-    int a = ZERO;
     for(int a = ZERO; a < HAND; a++) {
         playerHand[a] = deck[*deckIdx];
         (*deckIdx)++;
@@ -201,7 +193,6 @@ void dealHand(int deck[DECK], int *deckIdx, int playerHand[HAND]) {
 
 //Display player hand function
 void displayPlayerHand(char player[NAME], int playerHand[HAND]) {
-    int a = ZERO;
     printf("\n%s's hand:\n\n", player);
     printf("+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+\n");
     printf("|       |       |       |       |       |       |       |       |       |       |\n");
