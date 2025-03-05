@@ -51,10 +51,10 @@ int dealDiscard(int deck[DECK], int* deckIdx);
 void displaySingle(int discard);
 int comp(const void* a, const void* b);
 void readLeaderboardFile();
-int playerOption();
-int draw();
-int discardCard();
-void updateHand();
+int playerOption(char player[NAME]);
+int draw(int deck[DECK], int* deckIdx);
+int discardCard(char player[NAME], char playerHand[HAND], int pickUp);
+void updateHand(char player[NAME], char playerHand[HAND], int discardIdx, int* discard, int newCard);
 void trim(char* str);
 
 //Main function
@@ -128,15 +128,15 @@ void playGame() {
             displaySingle(discard);
             discardOrDraw = playerOption(one); 
             if(discardOrDraw == DISCARD) {
-                printf("Player picked up the discard.");
+                printf("\nPlayer picked up the discard\n");
                 pickUp = discard;
-                printf("New card");
+                printf("\nNew card\n");
                 displaySingle(pickUp);
             }
             else if(discardOrDraw == DRAW) {
                 printf("Player drew from the deck");
                 pickUp = draw(deck, &deckIdx);
-                printf("New card");
+                printf("\nNew card\n");
                 displaySingle(pickUp);
             }
             playerDiscard = discardCard(one, oneHand, pickUp);
@@ -148,15 +148,15 @@ void playGame() {
             displaySingle(discard);
             discardOrDraw = playerOption(two);
             if(discardOrDraw == DISCARD) {
-                printf("Player picked up the discard.");
+                printf("\nPlayer picked up the discard\n");
                 pickUp = discard;
-                printf("New card");
+                printf("\nNew card\n");
                 displaySingle(pickUp);
             }
             else if(discardOrDraw == DRAW) {
                 printf("Player drew from the deck");
                 pickUp = draw(deck, &deckIdx);
-                printf("New card");
+                printf("\nNew card\n");
                 displaySingle(pickUp);
             }
             playerDiscard = discardCard(two, twoHand, pickUp);
@@ -274,7 +274,7 @@ int dealDiscard(int deck[DECK], int *deckIdx) {
 
 //Display single function
 void displaySingle(int discard) {
-    printf("+-------+\n");
+    printf("\n+-------+\n");
     printf("|       |\n");
 
     if (discard == WILD) {
@@ -289,6 +289,27 @@ void displaySingle(int discard) {
 
     printf("|       |\n");
     printf("+-------+\n");
+}
+
+//
+void readLeaderboardFile() {
+
+}
+
+int playerOption(char player[NAME]){
+
+}
+
+int draw(int deck[DECK], int* deckIdx){
+
+}
+
+int discardCard(char player[NAME], char playerHand[HAND], int pickUp) {
+
+}
+
+void updateHand(char player[NAME], char playerHand[HAND], int discardIdx, int* discard, int newCard) {
+
 }
 
 //Display leaderboard function
