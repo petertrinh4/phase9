@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <ctype.h>
 
 //Macros for code readability
 #define ZERO 0
@@ -23,6 +24,18 @@
 #define TWELVE 12
 #define WILD 13
 #define SKIP 14
+#define LINE 100
+#define FIELDS 3
+#define DATA 45
+#define DISCARD 1
+#define DRAW 2
+#define THREE 3
+#define FIVE 5
+#define SIX 6
+#define SEVEN 7
+#define NINE 9
+#define TEN 10
+#define ELEVEN 11
 
 //Function prototypes
 void welcomeScreen();
@@ -35,8 +48,14 @@ void displayDeck(int deck[DECK]);
 void dealHand(int deck[DECK], int* deckIdx, int playerHand[HAND]);
 void displayPlayerHand(char player[NAME], int playerHand[HAND]);
 int dealDiscard(int deck[DECK], int* deckIdx);
-void displayDiscard(int discard);
+void displaySingle(int discard);
 int comp(const void* a, const void* b);
+void readLeaderboardFile();
+int playerOption();
+int draw();
+int discardCard();
+void updateHand();
+void trim(char* str);
 
 //Main function
 int main() {
@@ -77,6 +96,10 @@ void playGame() {
     int deckIdx = ZERO;
     int currentPlayer = ONE;
     int choice = ZERO;
+    int discardOrDraw = ZERO; //Stores player's choice to pick up discard/draw from deck
+    int pickUp = ZERO; //Stores the player's picked up card value(1-14)
+    int playerDiscard = ZERO;
+
     choice = displayMenu();
 
     while(choice != EXIT) {
@@ -88,11 +111,11 @@ void playGame() {
         printf("\n%s and %s let's play Phase 9!\n", one, two); //Print statement using the entered player names to play phase 9
         initializeDeck(deck);
         printf("\nUnshuffled deck of cards:\n");
-        displayDeck(deck);
+        //displayDeck(deck);
         printf("\n"); //Separates the deck of cards
         shuffleDeck(deck);
         printf("Shuffled deck of cards:\n");
-        displayDeck(deck);
+        //displayDeck(deck);
         dealHand(deck, &deckIdx, oneHand);
         qsort(oneHand, HAND, sizeof(oneHand[ZERO]), comp);
         dealHand(deck, &deckIdx, twoHand);
@@ -102,19 +125,49 @@ void playGame() {
         while(turn < TWO) {
         if(currentPlayer == ONE) {
             displayPlayerHand(one, oneHand);
-            displayDiscard(discard);
+            displaySingle(discard);
+            discardOrDraw = playerOption(one); 
+            if(discardOrDraw == DISCARD) {
+                printf("Player picked up the discard.");
+                pickUp = discard;
+                printf("New card");
+                displaySingle(pickUp);
+            }
+            else if(discardOrDraw == DRAW) {
+                printf("Player drew from the deck");
+                pickUp = draw(deck, &deckIdx);
+                printf("New card");
+                displaySingle(pickUp);
+            }
+            playerDiscard = discardCard(one, oneHand, pickUp);
+            updateHand(one, oneHand, playerDiscard, &discard, pickUp);
             currentPlayer = TWO;
         }
         else if(currentPlayer == TWO) {
             displayPlayerHand(two, twoHand);
-            displayDiscard(discard);
+            displaySingle(discard);
+            discardOrDraw = playerOption(two);
+            if(discardOrDraw == DISCARD) {
+                printf("Player picked up the discard.");
+                pickUp = discard;
+                printf("New card");
+                displaySingle(pickUp);
+            }
+            else if(discardOrDraw == DRAW) {
+                printf("Player drew from the deck");
+                pickUp = draw(deck, &deckIdx);
+                printf("New card");
+                displaySingle(pickUp);
+            }
+            playerDiscard = discardCard(two, twoHand, pickUp);
+            updateHand(two, twoHand, playerDiscard, &discard, pickUp);
             currentPlayer = ONE;
         }
         turn++;
         }
     }
     else if(choice == LEAD) {
-        displayLeaderboard();
+        readLeaderboardFile();
     }
     else {
         printf("\nThank you for playing Phase 9!\n");
@@ -219,12 +272,21 @@ int dealDiscard(int deck[DECK], int *deckIdx) {
     return discard;
 }
 
-//Display discard function
-void displayDiscard(int discard) {
-    printf("\nDiscard pile:\n\n");
+//Display single function
+void displaySingle(int discard) {
     printf("+-------+\n");
     printf("|       |\n");
-    printf("| %3d   |\n", discard);
+
+    if (discard == WILD) {
+        printf("|  W    |\n"); // Display 'W' for WILD
+    } 
+    else if (discard == SKIP) {
+        printf("|  S    |\n"); // Display 'S' for SKIP
+    } 
+    else {
+        printf("|%3d    |\n", discard); // Display actual value
+    }
+
     printf("|       |\n");
     printf("+-------+\n");
 }
