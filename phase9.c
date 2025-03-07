@@ -55,7 +55,7 @@ int playerOption(char player[NAME]);
 int draw(int deck[DECK], int* deckIdx);
 int discardCard(char player[NAME], char playerHand[HAND], int pickUp);
 void updateHand(char player[NAME], char playerHand[HAND], int discardIdx, int* discard, int newCard);
-void trim(char* str);
+char* trim(char* str);
 
 //Main function
 int main() {
@@ -117,9 +117,9 @@ void playGame() {
         printf("Shuffled deck of cards:\n");
         //displayDeck(deck);
         dealHand(deck, &deckIdx, oneHand);
-        qsort(oneHand, HAND, sizeof(oneHand[ZERO]), comp);
+        qsort(oneHand, HAND, sizeof(oneHand[ZERO]), comp); //Sort player 1's hand
         dealHand(deck, &deckIdx, twoHand);
-        qsort(twoHand, HAND, sizeof(twoHand[ZERO]), comp);
+        qsort(twoHand, HAND, sizeof(twoHand[ZERO]), comp); //Sort player 2's hand
         int discard = dealDiscard(deck, &deckIdx);
         
         while(turn < TWO) {
@@ -291,25 +291,54 @@ void displaySingle(int discard) {
     printf("+-------+\n");
 }
 
-//
+//Reads from leaderboard txt file
 void readLeaderboardFile() {
+    char line[LINE];
+    int fieldIdx = ZERO;
+    char* data[DATA];
+    FILE* fp = fopen("leaderboard.txt", "r");
+    printf("X      XXXX      X      XXXX    XXXX   XXXX    XXXX    XXXX      X      XXXX    XXXX\n"); //Prints the leaderboard header
+    printf("X      X        X X     X   X   X      X   X   X   X   X  X     X X     X   X   X   X\n");
+    printf("X      XXXX    XX XX    X   X   XXXX   XXXX    XXXX    X  X    XX XX    XXXX    X   X\n");
+    printf("X      X       X   X    X   X   X      X  X    X   X   X  X    X   X    X  X    X   X\n");
+    printf("XXXX   XXXX   X     X   XXXX    XXXX   X   X   XXXX    XXXX   X     X   X   X   XXXX\n");
 
+    if(fp == NULL) {
+        perror("Error opening file");
+        return;
+    }
+    while(fgets != NULL) {
+        fgets(line, LINE, fp);
+        char* field = strtok(line, ",");
+        field = trim(field);
+        while(field != NULL) {
+            data[fieldIdx] = malloc(strlen(field + 1));
+            strcpy(data[fieldIdx], field);
+            field = strtok(NULL, ",");
+            field = trim(field);
+            fieldIdx++;
+        }
+    }
+    fclose(fp);
+    for(int i = ZERO; i < DATA; i += FIELDS) {
+        printf(data[i+1]);
+    }
 }
 
+//
 int playerOption(char player[NAME]){
-
 }
 
+//
 int draw(int deck[DECK], int* deckIdx){
-
 }
 
+//
 int discardCard(char player[NAME], char playerHand[HAND], int pickUp) {
-
 }
 
+//
 void updateHand(char player[NAME], char playerHand[HAND], int discardIdx, int* discard, int newCard) {
-
 }
 
 //Display leaderboard function
@@ -331,4 +360,21 @@ void displayLeaderboard() {
 //Shuffle card function
 int comp(const void *a, const void *b) {
 return (*(int *)a - *(int *)b);
+}
+
+//
+char* trim(char* str) {
+    if(str == NULL || *str == '\0') { //Checks if the string is empty
+        return str;
+    }
+    char* start = str; //Trims leading white space
+    while(isspace((unsigned char) * start)) {
+        start++;
+    }
+    char* end = str + strlen(str) - 1; //Trims trailing white space
+    while(end > start && isspace((unsigned char) * end)) {
+        end--;
+    }
+    end[1] = '\0'; //Adds the null terminator
+    return start; //Returns the updated string
 }
