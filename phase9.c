@@ -1,13 +1,11 @@
 
-//Header files
-#include <stdio.h>
+#include <stdio.h> //Header files
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
 #include <ctype.h>
 
-//Macros for code readability
-#define ZERO 0
+#define ZERO 0 //Macros for code readability
 #define ONE 1
 #define TWO 2
 #define FOURTEEN 14
@@ -37,8 +35,7 @@
 #define TEN 10
 #define ELEVEN 11
 
-//Function prototypes
-void welcomeScreen();
+void welcomeScreen(); //Function prototypes
 void playGame();
 int displayMenu();
 void displayLeaderboard();
@@ -155,7 +152,6 @@ void playGame() { //Play game function
                         printf("\n\nNew card");
                         displaySingle(pickUp);
                     }
-
                     playerDiscard = discardCard(two, twoHand, pickUp);
                     updateHand(two, twoHand, playerDiscard, &discard, pickUp);
                     currentPlayer = ONE;
@@ -167,7 +163,6 @@ void playGame() { //Play game function
             readLeaderboardFile();
         }
         else {
-            printf("\nThank you for playing Phase 9!\n");
             exit(ZERO);
         }
         choice = displayMenu();
@@ -383,8 +378,8 @@ void displayLeaderboard() { //Display leaderboard function
     printf("       7          Manny       16       \n");
 }
 
-int comp(const void *a, const void *b) { //Shuffle card function
-    return (*(int *)a - *(int *)b);
+int comp(const void* a, const void* b) { //Shuffle card function
+    return (*(int*)a - *(int*)b);
 }
 
 char* trim(char* str) { //Trims white space
