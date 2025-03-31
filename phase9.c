@@ -34,6 +34,15 @@
 #define NINE 9
 #define TEN 10
 #define ELEVEN 11
+#define THIRTEEN 13
+
+struct Player {
+    int playerNum;
+    char playerName[NAME];
+    int playerHand[TEN];
+    int currentPhase;
+    int wins;
+};
 
 void welcomeScreen(); //Function prototypes
 void playGame();
@@ -53,6 +62,11 @@ int draw(int deck[DECK], int* deckIdx);
 int discardCard(char player[NAME], int playerHand[HAND], int pickUp);
 void updateHand(char player[NAME], int playerHand[HAND], int discardIdx, int* discard, int newCard);
 char* trim(char* str);
+int checkPhase();
+int countRuns();
+int countSets();
+void updatePhase();
+void displayPhase();
 
 int main() { //Main function
     welcomeScreen(); //Write the function declaration or prototype for function welcomeScreen
@@ -82,10 +96,10 @@ void welcomeScreen() { //Welcome screen function
 }
 
 void playGame() { //Play game function
-    char one[NAME]; //Stores player one's name
-    char two[NAME]; //Stores player two's name
-    int oneHand[HAND];
-    int twoHand[HAND];
+    struct Player one; //Stores player one's name
+    struct Player two; //Stores player two's name
+    //int oneHand[HAND];
+    //int twoHand[HAND];
     int turn = ZERO;
     int deck[DECK];
     int deckIdx = ZERO;
@@ -99,62 +113,84 @@ void playGame() { //Play game function
     while(choice != EXIT) {
         if(choice == PLAY) {
             printf("\nPlayer One, enter your name: "); //Print statement to prompt player one to enter their name
-            scanf("%s", one); //Scan statement to store player one’s name in variable one
+            scanf("%s", one.playerName); //Scan statement to store player one’s name in variable one
+            one.playerNum = ONE;
+            one.currentPhase = ONE;
+            one.wins = ZERO;
             printf("Player Two, enter your name: "); //Print statement to prompt player two to enter their name
-            scanf("%s", two); //Scan statement to store player two’s name in variable two
-            printf("\n%s and %s let's play Phase 9!", one, two); //Print statement using the entered player names to play phase 9
+            scanf("%s", two.playerName); //Scan statement to store player two’s name in variable two
+            two.playerNum = TWO;
+            two.currentPhase = ONE;
+            two.wins = ZERO;
+            printf("\n%s and %s let's play Phase 9!", one.playerName, two.playerName); //Print statement using the entered player names to play phase 9
             initializeDeck(deck);
             printf("\n"); //Separates the deck of cards
             shuffleDeck(deck);
-            dealHand(deck, &deckIdx, oneHand);
-            qsort(oneHand, HAND, sizeof(oneHand[ZERO]), comp); //Sort player 1's hand
-            dealHand(deck, &deckIdx, twoHand);
-            qsort(twoHand, HAND, sizeof(twoHand[ZERO]), comp); //Sort player 2's hand
+            dealHand(deck, &deckIdx, one.playerHand);
+            qsort(one.playerHand, HAND, sizeof(one.playerHand[ZERO]), comp); //Sort player 1's hand
+            dealHand(deck, &deckIdx, two.playerHand);
+            qsort(two.playerHand, HAND, sizeof(two.playerHand[ZERO]), comp); //Sort player 2's hand
             int discard = dealDiscard(deck, &deckIdx);
             
-            while(turn < TWO) {
-                if(currentPlayer == ONE) {
-                    displayPlayerHand(one, oneHand);
+            while(turn < FOUR) {
+                if(currentPlayer == one.playerNum) {
+                    displayPhase(one.currentPhase);
+                    displayPlayerHand(one.playerName, one.playerHand);
                     printf("\nDiscard pile");
                     displaySingle(discard);
-                    discardOrDraw = playerOption(one); 
+                    discardOrDraw = playerOption(one.playerName); 
                     if(discardOrDraw == DISCARD) {
-                        printf("Player picked up the discard\n");
+                        printf("%s picked up the discard\n", one.playerName);
                         pickUp = discard;
                         printf("\nNew card");
                         displaySingle(pickUp);
                     }
                     else if(discardOrDraw == DRAW) {
-                        printf("Player drew from the deck");
+                        printf("%s drew from the deck", one.playerName);
                         pickUp = draw(deck, &deckIdx);
                         printf("\n\nNew card");
                         displaySingle(pickUp);
                     }
-                    playerDiscard = discardCard(one, oneHand, pickUp);
-                    updateHand(one, oneHand, playerDiscard, &discard, pickUp);
-                    currentPlayer = TWO;
+                    playerDiscard = discardCard(one.playerName, one.playerHand, pickUp);
+                    updateHand(one.playerName, one.playerHand, playerDiscard, &discard, pickUp);
+                    if(checkPhase(one) == TRUE) {
+                        printf("Player one completed the phase\n");
+                        updatePhase(&one);
+                    }
+                    else {
+                        printf("Player one did not complete the phase");
+                    }
+                    currentPlayer = two.playerNum;
                 }
-                else if(currentPlayer == TWO) {
-                    displayPlayerHand(two, twoHand);
+                else if(currentPlayer == two.playerNum) {
+                    displayPhase(two.currentPhase);
+                    displayPlayerHand(two.playerName, two.playerHand);
                     printf("\nDiscard pile");
                     displaySingle(discard);
-                    discardOrDraw = playerOption(two);
+                    discardOrDraw = playerOption(two.playerName);
 
                     if(discardOrDraw == DISCARD) {
-                        printf("Player picked up the discard\n");
+                        printf("%s picked up the discard\n", two.playerName);
                         pickUp = discard;
                         printf("\nNew card");
                         displaySingle(pickUp);
                     }
                     else if(discardOrDraw == DRAW) {
-                        printf("Player drew from the deck");
+                        printf("%s drew from the deck", two.playerName);
                         pickUp = draw(deck, &deckIdx);
                         printf("\n\nNew card");
                         displaySingle(pickUp);
                     }
-                    playerDiscard = discardCard(two, twoHand, pickUp);
-                    updateHand(two, twoHand, playerDiscard, &discard, pickUp);
-                    currentPlayer = ONE;
+                    playerDiscard = discardCard(two.playerName, two.playerHand, pickUp);
+                    updateHand(two.playerName, two.playerHand, playerDiscard, &discard, pickUp);
+                    if(checkPhase(two) == TRUE) {
+                        printf("Player two completed the phase");
+                        updatePhase(&two);
+                    }
+                    else {
+                        printf("Player two did not complete the phase");
+                    }
+                    currentPlayer = one.playerNum;
                 }
                 turn++;
             }
@@ -337,12 +373,24 @@ int draw(int deck[DECK], int* deckIdx){ //Draw function
 
 int discardCard(char player[NAME], int playerHand[HAND], int pickUp) { //Discard card function
     int choice = ZERO;
+    int valid = ZERO;
+    while(!valid) {
+        printf("   (1)     (2)     (3)     (4)     (5)     (6)     (7)     (8)     (9)     (10)");
+        printf("  (11)\n");
+        printf("\nSelect which card to discard (1 - 11): ");
+        scanf("%d", &choice);
+        if(choice >= 1 && choice <= 11) {
+            valid == TRUE;
+        }
+        else {
+            valid == FALSE;
+        }
+    }
     displayPlayerHand(player, playerHand);
-    printf("   (1)     (2)     (3)     (4)     (5)     (6)     (7)     (8)     (9)     (10)");
+    
     displaySingle(pickUp);
-    printf("  (11)\n");
-    printf("\nSelect which card to discard (1 - 11): ");
-    scanf("%d", &choice);
+    
+
     return choice;
 }
 
@@ -354,7 +402,7 @@ void updateHand(char player[NAME], int playerHand[HAND], int discardIdx, int* di
     else {
         int card = playerHand[discardIdx - ONE];
         playerHand[discardIdx - ONE] = newCard;
-        displayPlayerHand(player, playerHand);
+        //displayPlayerHand(player, playerHand);
         qsort(playerHand, HAND, sizeof(playerHand[ZERO]), comp);
         *discard = card;
         displayPlayerHand(player, playerHand);
