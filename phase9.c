@@ -62,17 +62,17 @@ int draw(int deck[DECK], int* deckIdx);
 int discardCard(char player[NAME], int playerHand[HAND], int pickUp);
 void updateHand(char player[NAME], int playerHand[HAND], int discardIdx, int* discard, int newCard);
 char* trim(char* str);
-int checkPhase();
-int countRuns();
-int countSets();
-void updatePhase();
-void displayPhase();
+int checkPhase(struct Player player);
+int countRuns(int playerHand[HAND], int size, int runSize);
+int countSets(int playerHand[HAND], int size, int setSize);
+void updatePhase(struct Player* player);
+void displayPhase(int currentPhase);
 
 int main() { //Main function
     welcomeScreen(); //Write the function declaration or prototype for function welcomeScreen
     srand((unsigned int)time(NULL));
     playGame(); //Write the function declaration or prototype for function playGame
-    return 0; //Returns zero to indicate successful operation of the program
+    return ZERO; //Returns zero to indicate successful operation of the program
 }
 
 void welcomeScreen() { //Welcome screen function
@@ -154,11 +154,11 @@ void playGame() { //Play game function
                     playerDiscard = discardCard(one.playerName, one.playerHand, pickUp);
                     updateHand(one.playerName, one.playerHand, playerDiscard, &discard, pickUp);
                     if(checkPhase(one) == TRUE) {
-                        printf("Player one completed the phase\n");
+                        printf("\n%s completed their phase!\n", one.playerName);
                         updatePhase(&one);
                     }
                     else {
-                        printf("Player one did not complete the phase");
+                        printf("\n%s did not complete their phase\n", one.playerName);
                     }
                     currentPlayer = two.playerNum;
                 }
@@ -184,11 +184,11 @@ void playGame() { //Play game function
                     playerDiscard = discardCard(two.playerName, two.playerHand, pickUp);
                     updateHand(two.playerName, two.playerHand, playerDiscard, &discard, pickUp);
                     if(checkPhase(two) == TRUE) {
-                        printf("Player two completed the phase");
+                        printf("\n%s completed their phase!\n", two.playerName);
                         updatePhase(&two);
                     }
                     else {
-                        printf("Player two did not complete the phase");
+                        printf("\n%s did not complete the phase\n", two.playerName);
                     }
                     currentPlayer = one.playerNum;
                 }
@@ -374,23 +374,20 @@ int draw(int deck[DECK], int* deckIdx){ //Draw function
 int discardCard(char player[NAME], int playerHand[HAND], int pickUp) { //Discard card function
     int choice = ZERO;
     int valid = ZERO;
+    displayPlayerHand(player, playerHand);
+    printf("   (1)     (2)     (3)     (4)     (5)     (6)     (7)     (8)     (9)     (10)");
+    displaySingle(pickUp);
+    printf("  (11)\n");
     while(!valid) {
-        printf("   (1)     (2)     (3)     (4)     (5)     (6)     (7)     (8)     (9)     (10)");
-        printf("  (11)\n");
         printf("\nSelect which card to discard (1 - 11): ");
         scanf("%d", &choice);
         if(choice >= 1 && choice <= 11) {
-            valid == TRUE;
+            valid = TRUE;
         }
         else {
-            valid == FALSE;
+            valid = FALSE;
         }
     }
-    displayPlayerHand(player, playerHand);
-    
-    displaySingle(pickUp);
-    
-
     return choice;
 }
 
@@ -408,6 +405,128 @@ void updateHand(char player[NAME], int playerHand[HAND], int discardIdx, int* di
         displayPlayerHand(player, playerHand);
         printf("\nDiscarded card");
         displaySingle(*discard);
+    }
+}
+
+int checkPhase(struct Player player) { //Check phase function
+    int sets = ZERO;
+    int setsTwo = ZERO;
+    int runs = ZERO;
+    switch(player.currentPhase) {
+        case ONE:
+            sets = countSets(player.playerHand, HAND, THREE);
+            return sets >= TWO;
+            break;
+        case TWO:
+            sets = countSets(player.playerHand, HAND, THREE);
+            runs = countRuns(player.playerHand, HAND, FOUR);
+            return sets >= ONE && runs >= ONE;
+            break;
+        case THREE:
+            sets = countSets(player.playerHand, HAND, FOUR);
+            runs = countRuns(player.playerHand, HAND, FOUR);
+            return sets >= ONE && runs >= ONE;
+            break;
+        case FOUR:
+            runs = countRuns(player.playerHand, HAND, SEVEN);
+            return runs >= ONE;
+            break;
+        case FIVE:
+            runs = countRuns(player.playerHand, HAND, EIGHT);
+            return runs >= ONE;
+            break;
+        case SIX:
+            runs = countRuns(player.playerHand, HAND, NINE);
+            return runs >= ONE;
+            break;
+        case SEVEN:
+            sets = countSets(player.playerHand, HAND, FOUR);
+            return sets >= TWO;
+            break;
+        case EIGHT:
+            sets = countSets(player.playerHand, HAND, FIVE);
+            setsTwo = countSets(player.playerHand, HAND, TWO);
+            return sets >= ONE && setsTwo >= ONE;
+            break;
+        case NINE:
+            sets = countSets(player.playerHand, HAND, FIVE);
+            setsTwo = countSets(player.playerHand, HAND, THREE);
+            return sets >= ONE && setsTwo >= ONE;
+            break;
+        default:
+            return ZERO;
+            break;
+    }
+}
+
+int countSets(int playerHand[HAND], int size, int setSize) { //Count sets function
+    int counts[THIRTEEN] = {ZERO};
+    int setCount = ZERO;
+    for(int i = ZERO; i < size; i++) {
+        if(playerHand[i] >= ONE && playerHand[i] <= TWELVE) {
+            counts[playerHand[i] - ONE]++;
+        }
+        for(int i = ZERO; i < THIRTEEN; i++) {
+            if(counts[i] >= setSize) {
+                setCount++;
+            }
+        }
+    }
+    return setCount;
+}
+
+int countRuns(int playerHand[HAND], int size, int runSize) { //Count run function
+    int runs = ZERO;
+    for(int i = ZERO; i < size; i++) {
+        int currentRun = ONE;
+        for(int j = i + ONE; j < size; j++) {
+            if(playerHand[j] == playerHand[i] + currentRun) {
+                currentRun++;
+                if(currentRun == runSize) {
+                    runs++;
+                    break;
+                }
+            }
+        }
+    }
+    return runs;
+}
+
+void updatePhase(struct Player* player) { //Update phase function
+    if(player->currentPhase < NINE) {
+        player->currentPhase++;
+    }
+}
+
+void displayPhase(int currentPhase) { //Display phase function
+    switch(currentPhase) {
+        case ONE:
+            printf("\nCurrent phase: 2 sets of 3\n");
+            break;
+        case TWO:
+            printf("\nCurrent phase: 1 set of 3 + 1 run of 4\n");
+            break;
+        case THREE:
+            printf("\nCurrent phase: 1 set of 4 + 1 run of 4\n");
+            break;
+        case FOUR:
+            printf("\nCurrent phase: 1 run of 7\n");
+            break;
+        case FIVE:
+            printf("\nCurrent phase: 1 run of 8\n");
+            break;
+        case SIX:
+            printf("\nCurrent phase: 1 run of 9\n");
+            break;
+        case SEVEN:
+            printf("\nCurrent phase: 2 sets of 4\n");
+            break;
+        case EIGHT:
+            printf("\nCurrent phase: 1 set of 5 + 1 set of 2\n");
+            break;
+        case NINE:
+            printf("\nCurrent phase: 1 set of 5 + 1 set of 3\n");
+            break;
     }
 }
 
