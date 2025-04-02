@@ -109,7 +109,6 @@ void playGame() { //Play game function
     int pickUp = ZERO; //Stores the player's picked up card value(1-14)
     int playerDiscard = ZERO;
     choice = displayMenu();
-
     while(choice != EXIT) {
         if(choice == PLAY) {
             printf("\nPlayer One, enter your name: "); //Print statement to prompt player one to enter their name
@@ -131,7 +130,6 @@ void playGame() { //Play game function
             dealHand(deck, &deckIdx, two.playerHand);
             qsort(two.playerHand, HAND, sizeof(two.playerHand[ZERO]), comp); //Sort player 2's hand
             int discard = dealDiscard(deck, &deckIdx);
-            
             while(turn < FOUR) {
                 if(currentPlayer == one.playerNum) {
                     displayPhase(one.currentPhase);
@@ -188,7 +186,7 @@ void playGame() { //Play game function
                         updatePhase(&two);
                     }
                     else {
-                        printf("\n%s did not complete the phase\n", two.playerName);
+                        printf("\n%s did not complete their phase\n", two.playerName);
                     }
                     currentPlayer = one.playerNum;
                 }
@@ -272,7 +270,6 @@ void displayPlayerHand(char player[NAME], int playerHand[HAND]) { //Display play
     printf("+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+\n");
     printf("|       |       |       |       |       |       |       |       |       |       |\n");
     printf("|");
-
     for(int a = ZERO; a < HAND; a++) {
         if(playerHand[a] == WILD) {
             printf("   W   |");
@@ -284,7 +281,6 @@ void displayPlayerHand(char player[NAME], int playerHand[HAND]) { //Display play
             printf("  %3d  |", playerHand[a]);
         }
     }
-
     printf("\n|       |       |       |       |       |       |       |       |       |       |\n");
     printf("+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+\n");
 }
@@ -298,7 +294,6 @@ int dealDiscard(int deck[DECK], int *deckIdx) { //Deal discard function
 void displaySingle(int discard) { //Display single function
     printf("\n+-------+\n");
     printf("|       |\n");
-
     if (discard == WILD) {
         printf("|  W    |\n"); // Display 'W' for WILD
     } 
@@ -308,7 +303,6 @@ void displaySingle(int discard) { //Display single function
     else {
         printf("| %3d   |\n", discard); // Display actual value
     }
-
     printf("|       |\n");
     printf("+-------+\n");
 }
@@ -324,7 +318,6 @@ void readLeaderboardFile() { //Reads the leaderboard text file
     printf("---------------------------------------\n");
     printf("   Position      Player      Wins      \n");
     printf("   --------      ------     ------      \n");
-
     if(fp == NULL) {
         perror("Error opening file");
         return;
