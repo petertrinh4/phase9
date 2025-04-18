@@ -1,72 +1,10 @@
 
-#include <stdio.h> //Header files
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
 #include <ctype.h>
-
-#define ZERO 0 //Macros for code readability
-#define ONE 1
-#define TWO 2
-#define FOURTEEN 14
-#define NAME 20
-#define PLAY 1
-#define LEAD 2
-#define EXIT 3
-#define FALSE 0
-#define TRUE 1
-#define HAND 10
-#define DECK 108
-#define FOUR 4
-#define EIGHT 8
-#define TWELVE 12
-#define WILD 13
-#define SKIP 14
-#define LINE 100
-#define FIELDS 3
-#define DATA 45
-#define DISCARD 1
-#define DRAW 2
-#define THREE 3
-#define FIVE 5
-#define SIX 6
-#define SEVEN 7
-#define NINE 9
-#define TEN 10
-#define ELEVEN 11
-#define THIRTEEN 13
-
-struct Player {
-    int playerNum;
-    char playerName[NAME];
-    int playerHand[TEN];
-    int currentPhase;
-    int wins;
-};
-
-void welcomeScreen(); //Function prototypes
-void playGame();
-int displayMenu();
-void displayLeaderboard();
-void initializeDeck(int deck[DECK]);
-void shuffleDeck(int deck[DECK]);
-void displayDeck(int deck[DECK]);
-void dealHand(int deck[DECK], int* deckIdx, int playerHand[HAND]);
-void displayPlayerHand(char player[NAME], int playerHand[HAND]);
-int dealDiscard(int deck[DECK], int* deckIdx);
-void displaySingle(int discard);
-int comp(const void* a, const void* b);
-void readLeaderboardFile();
-int playerOption(char player[NAME]);
-int draw(int deck[DECK], int* deckIdx);
-int discardCard(char player[NAME], int playerHand[HAND], int pickUp);
-void updateHand(char player[NAME], int playerHand[HAND], int discardIdx, int* discard, int newCard);
-char* trim(char* str);
-int checkPhase(struct Player player);
-int countRuns(int playerHand[HAND], int size, int runSize);
-int countSets(int playerHand[HAND], int size, int setSize);
-void updatePhase(struct Player* player);
-void displayPhase(int currentPhase);
+#include "phase9.h"
 
 int main() { //Main function
     welcomeScreen(); //Write the function declaration or prototype for function welcomeScreen
@@ -130,7 +68,7 @@ void playGame() { //Play game function
             dealHand(deck, &deckIdx, two.playerHand);
             qsort(two.playerHand, HAND, sizeof(two.playerHand[ZERO]), comp); //Sort player 2's hand
             int discard = dealDiscard(deck, &deckIdx);
-            while(turn < FOUR) {
+            while(isGameOver(one, two) == FALSE) {
                 if(currentPlayer == one.playerNum) {
                     displayPhase(one.currentPhase);
                     displayPlayerHand(one.playerName, one.playerHand);
@@ -190,7 +128,16 @@ void playGame() { //Play game function
                     }
                     currentPlayer = one.playerNum;
                 }
-                turn++;
+                //turn++;
+            }
+            printf("\nGame over!\n");
+            if(one.currentPhase > NINE) {
+                printf("%s wins the game!\n", one.playerName);
+                one.wins++;
+            }
+            else if(two.currentPhase > NINE) {
+                printf("%s wins the game!\n", two.playerName);
+                two.wins++;
             }
         }
         else if(choice == LEAD) {
@@ -486,7 +433,7 @@ int countRuns(int playerHand[HAND], int size, int runSize) { //Count run functio
 }
 
 void updatePhase(struct Player* player) { //Update phase function
-    if(player->currentPhase < NINE) {
+    if(player->currentPhase < TEN) {
         player->currentPhase++;
     }
 }
@@ -556,4 +503,15 @@ char* trim(char* str) { //Trims white space
     }
     end[1] = '\0'; //Adds the null terminator
     return start; //Returns the updated string
+}
+
+int isGameOver(struct Player playerOne, struct Player playerTwo) {
+    int gameOver = FALSE;
+    if(playerOne.currentPhase > NINE || playerTwo.currentPhase > NINE) {
+            gameOver = TRUE;
+    }
+    else {
+            gameOver = FALSE;
+    }
+    return gameOver;
 }
